@@ -1,6 +1,6 @@
 spring:
   application:
-    name: events-processor-service
+    name: events-processor
   cloud:
     config:
       uri: http://config-server:8888
