@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-processor
+  namespace: espfog-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-processor
+  template:
+    metadata:
+      labels:
+        app: events-processor
+    spec:
+      containers:
+        - name: events-processor
+          image: docker-vm:8085/docker-hosted/events-processor:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: events-processor-hpa
+  namespace: espfog-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: events-processor
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

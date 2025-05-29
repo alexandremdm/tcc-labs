@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: events-processor-keda
+  namespace: espfog-services
+spec:
+  scaleTargetRef:
+    name: events-processor
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 20
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+        topic: iot-raw-events
+        consumerGroup: events-processor-group
+        lagThreshold: "10"
