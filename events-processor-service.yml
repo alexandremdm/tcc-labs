@@ -1,0 +1,24 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+    consumer:
+      group-id: events-processor-group
+      auto-offset-reset: latest
+
+processor:
+  thresholds:
+    temperature: 38.0
+    heart-rate: 120
+    blood-pressure:
+      systolic:
+        min: 90
+        max: 140
+      diastolic:
+        min: 60
+        max: 90
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health

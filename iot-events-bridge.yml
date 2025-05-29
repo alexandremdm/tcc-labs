@@ -1,0 +1,13 @@
+mqtt:
+  broker: tcp://mqtt-broker:1883
+  topic: iot-events
+
+kafka:
+  bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+  topic: iot-raw-events
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health
