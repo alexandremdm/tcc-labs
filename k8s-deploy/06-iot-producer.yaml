@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-producer
+  namespace: espfog-services # <--- Adicionado/Ajustado: Especifica a namespace
+  labels:
+    app: iot-producer
+spec:
+  replicas: 0 # Inicie com 0 réplicas para controle total sobre o início da publicação
+  selector:
+    matchLabels:
+      app: iot-producer
+  template:
+    metadata:
+      labels:
+        app: iot-producer
+    spec:
+      containers:
+      - name: producer
+        image: docker-vm:8085/docker-hosted/iot-producer:latest # Sua imagem Docker construída e publicada
+        imagePullPolicy: Always # Garante que a imagem mais recente seja sempre puxada
+        # Não há seção 'env' aqui, pois as configurações são fixas no código Python
+        resources: # Limites de recursos para evitar que o pod consuma demais
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      restartPolicy: Always # O Kubernetes vai reiniciar o pod se ele falhar
+      # Se o seu registry 'docker-vm:8085' exigir autenticação, adicione esta seção:
+      # imagePullSecrets:
+      # - name: regcred # Nome do Secret que você criou (kubectl create secret docker-registry regcred ...)

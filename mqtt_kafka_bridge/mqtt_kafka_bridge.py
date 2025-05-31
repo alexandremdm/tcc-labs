@@ -109,5 +109,5 @@ def rodar_teste_temporizado(duracao_total=300):
     print(f"\n[{datetime.now()}] Teste finalizado após {duracao_total} segundos.")
 
 if __name__ == "__main__":
-    rodar_teste_temporizado(30)  # Rodar 5 minutos
+    rodar_teste_temporizado(600)  # Rodar 5 minutos
 

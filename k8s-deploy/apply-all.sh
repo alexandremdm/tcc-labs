@@ -11,5 +11,5 @@ kubectl apply -f 02-iot-events-bridge.yaml
 kubectl apply -f 03-events-processor.yaml
 kubectl apply -f 04-health-alert-manager.yaml
 kubectl apply -f 05-keda-scaledobject-events-processor.yaml
-
+kubectl apply -f 06-iot-producer.yaml
 echo '✅ Implantação completa.'

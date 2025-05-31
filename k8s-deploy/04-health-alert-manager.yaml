@@ -13,32 +13,25 @@ spec:
       labels:
         app: health-alert-manager
     spec:
+      hostAliases:
+      - ip: 192.168.122.136
+        hostnames:
+        - kafka-1
+      - ip: 192.168.122.121
+        hostnames:
+        - kafka-2
+      - ip: 192.168.122.69
+        hostnames:
+        - kafka-3      
       containers:
         - name: health-alert-manager
           image: docker-vm:8085/docker-hosted/health-alert-manager:latest
           ports:
             - containerPort: 8081
           resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
             limits:
               memory: "512Mi"
               cpu: "500m"
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: health-alert-manager-hpa
-  namespace: espfog-services
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: health-alert-manager
-  minReplicas: 1
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 60

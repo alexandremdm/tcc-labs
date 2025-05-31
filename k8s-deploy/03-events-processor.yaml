@@ -13,32 +13,25 @@ spec:
       labels:
         app: events-processor
     spec:
+      hostAliases:
+      - ip: 192.168.122.136
+        hostnames:
+        - kafka-1
+      - ip: 192.168.122.121
+        hostnames:
+        - kafka-2
+      - ip: 192.168.122.69
+        hostnames:
+        - kafka-3      
       containers:
         - name: events-processor
           image: docker-vm:8085/docker-hosted/events-processor:latest
           ports:
             - containerPort: 8080
           resources:
+            requests:
+              memory: "256Mi" 
+              cpu: "100m"       
             limits:
               memory: "512Mi"
               cpu: "500m"
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: events-processor-hpa
-  namespace: espfog-services
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: events-processor
-  minReplicas: 1
-  maxReplicas: 20
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 60

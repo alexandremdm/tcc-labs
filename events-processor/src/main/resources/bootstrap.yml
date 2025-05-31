@@ -1,6 +1,8 @@
 spring:
   application:
     name: events-processor
+  config:
+    import: configserver:http://config-server:8888
   cloud:
     config:
       uri: http://config-server:8888

@@ -13,32 +13,28 @@ spec:
       labels:
         app: iot-events-bridge
     spec:
+      hostAliases:
+      - ip: 192.168.122.136
+        hostnames:
+        - kafka-1
+      - ip: 192.168.122.121
+        hostnames:
+        - kafka-2
+      - ip: 192.168.122.69
+        hostnames:
+        - kafka-3      
+      - ip: 192.168.122.81
+        hostnames:
+        - mqtt-broker     
       containers:
         - name: iot-events-bridge
           image: docker-vm:8085/docker-hosted/iot-events-bridge:latest
           ports:
             - containerPort: 8080
           resources:
+            requests: 
+              memory: "256Mi" 
+              cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: iot-events-bridge-hpa
-  namespace: espfog-services
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: iot-events-bridge
-  minReplicas: 1
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 60
+              cpu: "500m"    

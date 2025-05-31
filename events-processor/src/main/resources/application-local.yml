@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  cloud:
+    config:
+      enabled: false
   kafka:
     bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
     consumer:

@@ -1,24 +1,23 @@
+server:
+  port: 8080
+
 spring:
+  cloud:
+    config:
+      enabled: false
   kafka:
     bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
     consumer:
       group-id: events-processor-group
-      auto-offset-reset: latest
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: MANUAL
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-processor:
-  thresholds:
-    temperature: 38.0
-    heart-rate: 120
-    blood-pressure:
-      systolic:
-        min: 90
-        max: 140
-      diastolic:
-        min: 60
-        max: 90
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus,health
+kafka:
+  topic:
+    ok: iot-events-ok
+    alert: iot-events-alert

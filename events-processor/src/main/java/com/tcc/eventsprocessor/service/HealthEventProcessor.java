@@ -3,6 +3,8 @@ package com.tcc.eventsprocessor.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tcc.eventsprocessor.model.HealthEvent;
 import com.tcc.eventsprocessor.model.SensorData;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,10 +13,14 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
 
 @Component
 public class HealthEventProcessor {
@@ -24,14 +30,17 @@ public class HealthEventProcessor {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${kafka.topic.ok}")
-    private String okTopic;
+    private final Timer totalLatencyTimer;
 
-    @Value("${kafka.topic.alert}")
-    private String alertTopic;
+    //@Value("${kafka.topic.ok}")
+    private String okTopic = "kafka.topic.ok";
+
+    //@Value("${kafka.topic.alert}")
+    private String alertTopic = "kafka.topic.alert";
 
     public HealthEventProcessor(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
+        this.totalLatencyTimer = Metrics.timer("events.end_to_end.latency_seconds", "service", "events_processor");
     }
 
     @KafkaListener(topics = "iot-raw-events", groupId = "events-processor-group")
@@ -59,6 +68,9 @@ public class HealthEventProcessor {
             Thread.sleep(delay);
 
             ack.acknowledge();
+
+            long totalLatencyNanos = ChronoUnit.NANOS.between(Instant.parse(event.getTimestamp()), Instant.now());
+            totalLatencyTimer.record(totalLatencyNanos, TimeUnit.NANOSECONDS);
 
         } catch (Exception e) {
             logger.error("Sent failed message to DLQ: iot-raw-events-dlq {}", e.getMessage());

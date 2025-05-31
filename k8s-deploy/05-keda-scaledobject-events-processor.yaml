@@ -13,7 +13,7 @@ spec:
   triggers:
     - type: kafka
       metadata:
-        bootstrapServers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+        bootstrapServers: 192.168.122.136:9092,192.168.122.97:9092,192.168.122.37:9092
         topic: iot-raw-events
         consumerGroup: events-processor-group
-        lagThreshold: "10"
+        lagThreshold: "100"
