@@ -1,15 +1,19 @@
+management: 
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true  
+
 spring:
   kafka:
     bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
     consumer:
       group-id: health-alert-manager-group
       auto-offset-reset: latest
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus,health
 kafka:
   topic:
     ok: iot-events-ok
