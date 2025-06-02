@@ -7,6 +7,8 @@ management:
       exposure:
         include: health,prometheus,metrics
   endpoint:
+    prometheus:
+      enabled: true
     health:
       probes:
         enabled: true  
