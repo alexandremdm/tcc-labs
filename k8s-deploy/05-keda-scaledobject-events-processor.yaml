@@ -16,4 +16,4 @@ spec:
         bootstrapServers: 192.168.122.136:9092,192.168.122.97:9092,192.168.122.37:9092
         topic: iot-raw-events
         consumerGroup: events-processor-group
-        lagThreshold: "100"
+        lagThreshold: "500"

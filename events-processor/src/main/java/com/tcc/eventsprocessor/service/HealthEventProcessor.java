@@ -3,6 +3,7 @@ package com.tcc.eventsprocessor.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tcc.eventsprocessor.model.HealthEvent;
 import com.tcc.eventsprocessor.model.SensorData;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
@@ -30,17 +31,23 @@ public class HealthEventProcessor {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final MeterRegistry meterRegistry;
+
     private final Timer totalLatencyTimer;
 
-    //@Value("${kafka.topic.ok}")
-    private String okTopic = "kafka.topic.ok";
+    @Value("${kafka.topic.ok}")
+    private String okTopic;
 
-    //@Value("${kafka.topic.alert}")
-    private String alertTopic = "kafka.topic.alert";
+    @Value("${kafka.topic.alert}")
+    private String alertTopic;
 
-    public HealthEventProcessor(KafkaTemplate<String, String> kafkaTemplate) {
+    public HealthEventProcessor(KafkaTemplate<String, String> kafkaTemplate, MeterRegistry meterRegistry) {
         this.kafkaTemplate = kafkaTemplate;
-        this.totalLatencyTimer = Metrics.timer("events.end_to_end.latency_seconds", "service", "events_processor");
+        this.meterRegistry = meterRegistry;
+        this.totalLatencyTimer = Timer.builder("events.end_to_end.latency_seconds")
+                .tag("service", "events_processor")
+                .description("End-to-end latency of event processing")
+                .register(meterRegistry);
     }
 
     @KafkaListener(topics = "iot-raw-events", groupId = "events-processor-group")
@@ -64,7 +71,7 @@ public class HealthEventProcessor {
             }
 
             // ✅ Latência randômica: 1ms a 20ms
-            int delay = ThreadLocalRandom.current().nextInt(1, 20);
+            int delay = ThreadLocalRandom.current().nextInt(10, 120);
             Thread.sleep(delay);
 
             ack.acknowledge();

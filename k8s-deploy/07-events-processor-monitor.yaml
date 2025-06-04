@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: events-processor-monitor
+  namespace: espfog-services # Mesma namespace da aplicação
+  labels:
+    release: prometheus # Ajuste se o release do seu kube-prometheus-stack for diferente
+spec:
+  selector:
+    matchLabels:
+      app: events-processor # Deve corresponder ao label no Service
+  endpoints:
+    - port: http-metrics # O nome da porta que você definiu no Service
+      path: /actuator/prometheus # OU /metrics, dependendo da sua configuração Actuator
+      interval: 30s # Opcional: frequência de scrape
+      scheme: http # Opcional: padrão é http, mas explicitar é bom
+  namespaceSelector:
+    matchNames:
+      - espfog-services # Garante que só procure services nesta namespace

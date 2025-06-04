@@ -57,11 +57,20 @@ def run_publisher():
         print(f"[{datetime.now()}] Conectando ao broker {BROKER}:{PORT} no tópico {TOPIC}...")
         client.connect(BROKER, PORT, 60)
         print(f"[{datetime.now()}] Conectado. Iniciando publicação de eventos (máxima velocidade).")
+
+        i = 1
         while True:
             payload, is_anomaly = generate_payload(ANOMALY_CHANCE)
             client.publish(TOPIC, payload)
             print(f"[{datetime.now()}] Publicado: {payload}")
-            # REMOVIDO: time.sleep(PUBLISH_INTERVAL_SEC)
+
+            i = i + 1
+
+            if (i > 1000):
+               sleep_interval = random.uniform(0.01,0.05)
+               time.sleep(sleep_interval)
+               i = 1
+
     except Exception as e:
         print(f"Erro na publicação: {e}")
         time.sleep(5) # Pequena espera em caso de erro antes de tentar novamente
